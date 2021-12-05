@@ -109,7 +109,7 @@ def play(word):
     if __name__ == "__main__":
         main()
     
-    
+    #CODE DOES NOT WORK AS IT WAS BASED OFF A YOUTUBE VIDEO. USED TO COMPARE THE TWO CODES
     
     
     
