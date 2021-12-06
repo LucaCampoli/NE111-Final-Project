@@ -41,7 +41,7 @@ def getRandomWord(wordList):
     """
     # This function returns a random string from the passed list of strings.
     wordIndex = random.randint(0, len(wordList) - 1)
-    return wordList[wordIndex]
+    return list(wordList.keys())[wordIndex]
 
 def spinWheel():
     l=['500','550','600','650','700','750','800','850','900','5000','Bankrupt','Lose a turn','Free Play']
