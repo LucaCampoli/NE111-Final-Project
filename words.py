@@ -6,7 +6,7 @@ Created on Sat Nov 13 19:05:57 2021
 """
 
 word_list = [
-    "cauchy bunyakovsky schwarz",
+    "cauchy bunyakovsky schwarz"
     "gram schmidt",
     "stoichiometry",
     "pendar mahmoudi",
@@ -54,24 +54,7 @@ word_list = [
     "wet etching",
     "dry etching",
     "eigen values",
-    "eigen spaces",
-    "metal deposition",
-    "silicon oxide deposition",
-    "substrate",
-    "nanometer",
-    "nanosecond",
-    "solidworks",
-    "engineering design",
-    "energy band",
-    "micropippeting",
-    "dilution",
-    "soldering",
-    "squeeze theorem",
-    "carbon nanotube",
-    "quantum nanodot",
-    "quantum nano center",
-    "pathways",
-    "is that right",
+    "eigen spaces"
     
     ]
 
