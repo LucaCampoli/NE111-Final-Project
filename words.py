@@ -6,7 +6,7 @@ Created on Sat Nov 13 19:05:57 2021
 """
 
 word_list = [
-    "cauchy bunyakovsky schwarz"
+    "cauchy bunyakovsky schwarz",
     "gram schmidt",
     "stoichiometry",
     "pendar mahmoudi",
@@ -58,4 +58,4 @@ word_list = [
     
     ]
 
-Categories: NE 100, NE 111, NE 109, NE 121, MATH 117, NE 112
+#Categories: NE 100, NE 111, NE 109, NE 121, MATH 117, NE 112
