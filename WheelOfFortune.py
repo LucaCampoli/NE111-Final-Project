@@ -1,35 +1,25 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Dec  6 09:54:20 2021
-
 @author: lucac
 """
 
 import random, pygame, sys, time, words
-
 pygame.init()
-
-wh = 800
 wl = 600
-whc = wh/2
-wlc = wl/2
+wh = 1000
+wlc = wh/2
+whc = wl/2
 windowSurface = pygame.display.set_mode((wh, wl), 0, 32)
 pygame.display.set_caption('Hangman')
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-# 66, 135, 245
 BLUE = (0, 0, 255)
-
 windowSurface.fill(WHITE)
-#pygame.draw.polygon(windowSurface, GREEN, ((146, 0), (291, 106), (236, 277), (56, 277), (0, 106)))
-
 # Set up the fonts.
 basicFont = pygame.font.SysFont(None, 24)
-smallFont = pygame.font.SysFont(None, 24)
-
 # Constants
 NUMBER_OF_ROUNDS = 3
 HELP_KEYWORD = "?"
@@ -59,7 +49,6 @@ def spinWheel():
 
 def displayBoard(missedLetters, correctLetters, secretWord):
     # Method has been heavily edited to return the board and missed letters as strings instead of printing them separately
-    # TODO could just print missed letters instead of passing them through this method
     """
     (tuple) -> tuple
     
@@ -69,42 +58,34 @@ def displayBoard(missedLetters, correctLetters, secretWord):
     If the input argument is invalid, return None.
     
     >>> displayBoard("mn", "te", "test")
-    ("t _ e t ", "m n ")
+    ("t _ e t", "m, n")
     >>> displayBoard("mnp", "lheo", "hello_world")
-    ("h e l l o   _ o _ l _ ", "m n p ")
+    ("h e l l o   _ o _ l _", "m, n, p")
     """
-    # TODO go back and make sure these are correct (with spacing and stuff)
     blanks = '_' * len(secretWord)
     missed = ''
     board = ''
-
     for i in range(len(missedLetters)):
         # Add a space in between each missed letter
-        # TODO maybe add a comma between each letter
         missed += missedLetters[i]
         if i != len(missedLetters) - 1:
             missed += ", "
-
     for i in range(len(secretWord)):
         # Replace blanks with correctly guessed letters
-        # TODO if guess in secretWord[i]
         if secretWord[i] in correctLetters:
             blanks = blanks[:i] + secretWord[i] + blanks[i+1:]
-
     for i in range(len(blanks)):
         # Add a space in between each entry on the board
         board += blanks[i]
         if i != len(blanks) - 1:
             board += " "
     return (board, missed)
-
-#def getGuess(alreadyGuessed)
     
-def guessedWord(guess, correctLetters, missedLetters):
+def guessedWord(guess, correctLetters, missedLetters, stage, message):
+
     
     if guess in secretWord:
         correctLetters += guess
-
         # Check if the player has won.
         foundAllLetters = True
         for i in range(len(secretWord)):
@@ -112,22 +93,20 @@ def guessedWord(guess, correctLetters, missedLetters):
                 foundAllLetters = False
                 break
         if foundAllLetters:
-            displayMessage('Yes! The secret word is "' + secretWord + '"! You have won!')
-            #TODO instance of sleep
-            #TODO not effective until next loop, so this sleep doesn't work
-            return True, correctLetters, missedLetters
+            message = 'Yes! The secret word is "' + secretWord + '"! You have won!'
+            return True, correctLetters, missedLetters, stage, message
     else:
         missedLetters += guess
         # Check if player has guessed too many times and lost.
         if len(missedLetters) == 6:
             displayBoard(missedLetters, correctLetters, secretWord)
-            displayMessage('You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"')
+            message = 'You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"'
+            
             #TODO instance of sleep
-            time.sleep(1)
-            pygame.draw.rect(windowSurface, WHITE, (windowSurface.get_rect().centerx, windowSurface.get_rect().centery + 200, 180, 80))
-            return True, correctLetters, missedLetters
+            return True, correctLetters, missedLetters, stage + 1, message
+        return False, correctLetters, missedLetters, stage + 1, message
         
-    return False, correctLetters, missedLetters
+    return False, correctLetters, missedLetters, stage, message
     """
     (str) -> str
     
@@ -140,24 +119,7 @@ def guessedWord(guess, correctLetters, missedLetters):
     >>> getGuess("A")
     "a"
     """
-
-    while True:
-        displayMessage('Guess a letter.')
-        guess = input()
-        guess = guess.lower()
-        #if len(guess) != 1:
-            #displayMessage('Please enter a single letter.')
-        if guess in alreadyGuessed:
-            displayMessage('You have already guessed that letter. Choose again.')
-            #TODO First instance of sleep
-            time.sleep(1)
-            pygame.draw.rect(windowSurface, WHITE, (windowSurface.get_rect().centerx, windowSurface.get_rect().centery + 200, 180, 80))
-        elif guess not in 'abcdefghijklmnopqrstuvwxyz':
-            displayMessage('Please enter a LETTER.')
-            time.sleep(1)
-            pygame.draw.rect(windowSurface, WHITE, (windowSurface.get_rect().centerx, windowSurface.get_rect().centery + 200, 180, 80))
-        else:
-            return guess
+    
 
 def playAgain():
     """
@@ -176,12 +138,10 @@ def playAgain():
         >>> "no"
     False
     """
-
     displayMessage('Do you want to play again? (y or n)')
     if event.key == pygame.K_y:
         return True
     return False
-    #TODO return input().lower().startswith('y')
 
 def pygameTextRenderer(renderedtext, offsetH, offsetV):
     text = basicFont.render(renderedtext, True, WHITE, BLUE)
@@ -196,7 +156,7 @@ def pygameTextRenderer(renderedtext, offsetH, offsetV):
     windowSurface.blit(text, textRect)
 
 def displayMessage(renderedtext):
-    text = smallFont.render(renderedtext, True, WHITE, BLUE)
+    text = basicFont.render(renderedtext, True, WHITE, BLUE)
     textRect = text.get_rect()
     textRect.centerx = windowSurface.get_rect().centerx
     textRect.centery = windowSurface.get_rect().centery + 200
@@ -208,7 +168,7 @@ def displayMessage(renderedtext):
     windowSurface.blit(text, textRect)
 
 def displayRound(roundnum):
-    text = smallFont.render(("Round " + str(roundnum)), True, WHITE, BLUE)
+    text = basicFont.render(("Round " + str(roundnum)), True, WHITE, BLUE)
     textRect = text.get_rect()
     textRect.centerx = windowSurface.get_rect().centerx - 300
     textRect.centery = windowSurface.get_rect().centery - 250
@@ -221,7 +181,7 @@ def displayRound(roundnum):
 
 def displayScore(score):
     
-    text = smallFont.render(("Score: " + str(score)), True, WHITE, BLUE)
+    text = basicFont.render(("Score: " + str(score)), True, WHITE, BLUE)
     textRect = text.get_rect()
     textRect.centerx = windowSurface.get_rect().centerx + 300
     textRect.centery = windowSurface.get_rect().centery - 250
@@ -232,17 +192,28 @@ def displayScore(score):
     # Draw the text onto the surface
     windowSurface.blit(text, textRect)
 
-def displayNaught():
-    pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
+def displayNaught(stage=0):
+    pygame.draw.polygon(windowSurface, GREEN, ((wlc-250, whc+75), (wlc-200, whc+50), (wlc-200, whc+50), (wlc-200, whc-150), (wlc-100, whc-150), (wlc-100, whc-125), (wlc-110, whc-125), (wlc-110, whc-140), (wlc-160, whc-140), (wlc-180, whc-120), (wlc-180, whc+50), (wlc-125, whc+75)))
+    if stage >= 1:
+        pygame.draw.circle(windowSurface, GREEN, (wlc-105, whc-100), 25)        
+    if stage >= 2:
+        pygame.draw.polygon(windowSurface, GREEN, ((wlc-110, whc-100), (wlc-100, whc-100), (wlc-100, whc), (wlc-110, whc)))
+    if stage >= 3:
+        pygame.draw.polygon(windowSurface, GREEN, ((wlc-110, whc-15), (wlc-135, whc+10), (wlc-125, whc+20), (wlc-105, whc)))
+    if stage >= 4:
+        pygame.draw.polygon(windowSurface, GREEN, ((wlc-100, whc-15), (wlc-75, whc+10), (wlc-85, whc+20), (wlc-105, whc)))
+    if stage >= 5:
+        pygame.draw.polygon(windowSurface, GREEN, ((wlc-110, whc-65), (wlc-135, whc-40), (wlc-125, whc-30), (wlc-105, whc-50)))
+    if stage >= 6:
+        pygame.draw.polygon(windowSurface, GREEN, ((wlc-100, whc-65), (wlc-75, whc-40), (wlc-85, whc-30), (wlc-105, whc-50)))
 
 missedLetters = ''
 correctLetters = ' '
-
 wordList = words.word_list
 secretWord = getRandomWord(wordList)
-
 gameIsDone = False
 guessingWord = False
+stage = 0
 roundNum = 1
 score = 0
 scoreToBeAdded = 0
@@ -256,11 +227,11 @@ while True:
     windowSurface.fill(WHITE)
     displayRound(roundNum)
     displayScore(score)
-    displayNaught()
+    displayNaught(stage)
     displayMessage(message)
     pygameTextRenderer((displayBoard(missedLetters, correctLetters, secretWord)[0]), 200, -100)
     pygameTextRenderer((displayBoard(missedLetters, correctLetters, secretWord)[1]), 200, 0)
-    
+
     # Get a pixel array of the surface.
     pixArray = pygame.PixelArray(windowSurface)
     pixArray[480][380] = BLACK
@@ -278,8 +249,9 @@ while True:
             sys.exit()
         if event.type == pygame.KEYDOWN:
             
+            print(stage)
+            
             if gameIsDone:
-
                 if playAgain():
                     windowSurface.fill(WHITE)
                     pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
@@ -289,6 +261,7 @@ while True:
                     secretWord = getRandomWord(wordList)
                     roundNum += 1
                     score = 0
+                    stage = 0
                 else:
                     break
             
@@ -299,14 +272,14 @@ while True:
                     # TODO print(pygame.key.name(event.key))
                     guess = pygame.key.name(event.key)
                     
-                    gameIsDone, correctLetters, missedLetters = guessedWord(guess, correctLetters, missedLetters)
+                    gameIsDone, correctLetters, missedLetters, stage, message = guessedWord(guess, correctLetters, missedLetters, stage, message)
                     guessingWord = False
-                    
+
                     message = "Press any key to Spin Wheel"
-                
+
                     # Ask the player if they want to play again (but only if the game is done).
-            
-            else:           
+
+            else:        
                 wheelResult = spinWheel()
                 
                 if wheelResult == 'Bankrupt':
@@ -321,6 +294,6 @@ while True:
                     print("Uhhh x2")
                 else:
                     scoreToBeAdded = int(wheelResult)
-                
+
                 message = "You landed on " + wheelResult
-                guessingWord = True
+                guessingWord = True 
