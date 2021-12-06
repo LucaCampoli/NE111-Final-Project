@@ -5,7 +5,7 @@ Created on Mon Dec  6 09:54:20 2021
 @author: lucac
 """
 
-import random, pygame, sys, time
+import random, pygame, sys, time, words
 
 pygame.init()
 
@@ -25,11 +25,14 @@ BLUE = (0, 0, 255)
 
 windowSurface.fill(WHITE)
 #pygame.draw.polygon(windowSurface, GREEN, ((146, 0), (291, 106), (236, 277), (56, 277), (0, 106)))
-pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
 
 # Set up the fonts.
-basicFont = pygame.font.SysFont(None, 48)
+basicFont = pygame.font.SysFont(None, 24)
 smallFont = pygame.font.SysFont(None, 24)
+
+# Constants
+NUMBER_OF_ROUNDS = 3
+HELP_KEYWORD = "?"
 
 def getRandomWord(wordList):
     """
@@ -49,6 +52,10 @@ def getRandomWord(wordList):
     # This function returns a random string from the passed list of strings.
     wordIndex = random.randint(0, len(wordList) - 1)
     return wordList[wordIndex]
+
+def spinWheel():
+    l=['500','550','600','650','700','750','800','850','900','5000','Bankrupt','Lose a turn','Free Play']
+    return random.choice(l)
 
 def displayBoard(missedLetters, correctLetters, secretWord):
     # Method has been heavily edited to return the board and missed letters as strings instead of printing them separately
@@ -91,7 +98,36 @@ def displayBoard(missedLetters, correctLetters, secretWord):
             board += " "
     return (board, missed)
 
-def getGuess(alreadyGuessed):
+#def getGuess(alreadyGuessed)
+    
+def guessedWord(guess, correctLetters, missedLetters):
+    
+    if guess in secretWord:
+        correctLetters += guess
+
+        # Check if the player has won.
+        foundAllLetters = True
+        for i in range(len(secretWord)):
+            if secretWord[i] not in correctLetters:
+                foundAllLetters = False
+                break
+        if foundAllLetters:
+            displayMessage('Yes! The secret word is "' + secretWord + '"! You have won!')
+            #TODO instance of sleep
+            #TODO not effective until next loop, so this sleep doesn't work
+            return True, correctLetters, missedLetters
+    else:
+        missedLetters += guess
+        # Check if player has guessed too many times and lost.
+        if len(missedLetters) == 6:
+            displayBoard(missedLetters, correctLetters, secretWord)
+            displayMessage('You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"')
+            #TODO instance of sleep
+            time.sleep(1)
+            pygame.draw.rect(windowSurface, WHITE, (windowSurface.get_rect().centerx, windowSurface.get_rect().centery + 200, 180, 80))
+            return True, correctLetters, missedLetters
+        
+    return False, correctLetters, missedLetters
     """
     (str) -> str
     
@@ -184,6 +220,7 @@ def displayRound(roundnum):
     windowSurface.blit(text, textRect)
 
 def displayScore(score):
+    
     text = smallFont.render(("Score: " + str(score)), True, WHITE, BLUE)
     textRect = text.get_rect()
     textRect.centerx = windowSurface.get_rect().centerx + 300
@@ -194,23 +231,29 @@ def displayScore(score):
     
     # Draw the text onto the surface
     windowSurface.blit(text, textRect)
-    
 
-words = "test hello-world boolean nanotechnology waterloo goose hangman python java programming".split()
+def displayNaught():
+    pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
+
 missedLetters = ''
-correctLetters = ''
-secretWord = "test"
+correctLetters = ' '
+
+wordList = words.word_list
+secretWord = getRandomWord(wordList)
 
 gameIsDone = False
-roundnum = 1
+guessingWord = False
+roundNum = 1
 score = 0
+scoreToBeAdded = 0
 
 keys = [pygame.K_a,pygame.K_b,pygame.K_c,pygame.K_d,pygame.K_e,pygame.K_f,pygame.K_g,pygame.K_h,pygame.K_i,pygame.K_j,pygame.K_k,pygame.K_l,pygame.K_m,pygame.K_n,pygame.K_o,pygame.K_p,pygame.K_q,pygame.K_r,pygame.K_a,pygame.K_s,pygame.K_t,pygame.K_u,pygame.K_v,pygame.K_w,pygame.K_x,pygame.K_y,pygame.K_z,pygame.K_QUESTION]
 
 
 while True:
-    displayRound(roundnum)
+    displayRound(roundNum)
     displayScore(score)
+    displayNaught()
     pygameTextRenderer((displayBoard(missedLetters, correctLetters, secretWord)[0]), 200, -100)
     pygameTextRenderer((displayBoard(missedLetters, correctLetters, secretWord)[1]), 200, 0)
     
@@ -230,46 +273,50 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            if event.key in keys:
-                # TODO print("You have pressed a letter")
-                # TODO print(pygame.key.name(event.key))
-                guess = pygame.key.name(event.key)
-                
-                if guess in secretWord:
-                    correctLetters += guess
             
-                    # Check if the player has won.
-                    foundAllLetters = True
-                    for i in range(len(secretWord)):
-                        if secretWord[i] not in correctLetters:
-                            foundAllLetters = False
-                            break
-                    if foundAllLetters:
-                        displayMessage('Yes! The secret word is "' + secretWord + '"! You have won!')
-                        #TODO instance of sleep
-                        #TODO not effective until next loop, so this sleep doesn't work
-                        gameIsDone = True
-                else:
-                    missedLetters += guess
-                    # Check if player has guessed too many times and lost.
-                    if len(missedLetters) == 6:
-                        displayBoard(missedLetters, correctLetters, secretWord)
-                        displayMessage('You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"')
-                        #TODO instance of sleep
-                        time.sleep(1)
-                        pygame.draw.rect(windowSurface, WHITE, (windowSurface.get_rect().centerx, windowSurface.get_rect().centery + 200, 180, 80))
-                        gameIsDone = True
+            if gameIsDone:
 
-                # Ask the player if they want to play again (but only if the game is done).
-                if gameIsDone:
-                    if playAgain():
-                        windowSurface.fill(WHITE)
-                        pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
-                        missedLetters = ''
-                        correctLetters = ''
-                        gameIsDone = False
-                        secretWord = getRandomWord(words)
-                        roundnum += 1
-                        score = 0
-                    else:
-                        break
+                if playAgain():
+                    windowSurface.fill(WHITE)
+                    pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
+                    missedLetters = ''
+                    correctLetters = ' '
+                    gameIsDone = False
+                    secretWord = getRandomWord(wordList)
+                    roundNum += 1
+                    score = 0
+                else:
+                    break
+            
+            if guessingWord:
+                if event.key in keys and pygame.key.name(event.key) not in correctLetters and pygame.key.name(event.key) not in missedLetters:
+                    
+                    # TODO print("You have pressed a letter")
+                    # TODO print(pygame.key.name(event.key))
+                    guess = pygame.key.name(event.key)
+                    
+                    gameIsDone, correctLetters, missedLetters = guessedWord(guess, correctLetters, missedLetters)
+                    guessingWord = False
+                    
+                    displayMessage("Press any key to Spin Wheel")
+                
+                    # Ask the player if they want to play again (but only if the game is done).
+            
+            else:           
+                wheelResult = spinWheel()
+                
+                if wheelResult == 'Bankrupt':
+                    
+                    score = 0
+                elif wheelResult == 'Lose a turn':
+                    
+                    print("Uhhhh")
+                elif wheelResult == 'Free Play':
+                    
+                    #You will not lose a life if you land here
+                    print("Uhhh x2")
+                else:
+                    scoreToBeAdded = int(wheelResult)
+                
+                displayMessage(wheelResult)
+                guessingWord = True
