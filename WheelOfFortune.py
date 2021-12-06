@@ -247,13 +247,17 @@ roundNum = 1
 score = 0
 scoreToBeAdded = 0
 
+message = ""
+
 keys = [pygame.K_a,pygame.K_b,pygame.K_c,pygame.K_d,pygame.K_e,pygame.K_f,pygame.K_g,pygame.K_h,pygame.K_i,pygame.K_j,pygame.K_k,pygame.K_l,pygame.K_m,pygame.K_n,pygame.K_o,pygame.K_p,pygame.K_q,pygame.K_r,pygame.K_a,pygame.K_s,pygame.K_t,pygame.K_u,pygame.K_v,pygame.K_w,pygame.K_x,pygame.K_y,pygame.K_z,pygame.K_QUESTION]
 
 
 while True:
+    windowSurface.fill(WHITE)
     displayRound(roundNum)
     displayScore(score)
     displayNaught()
+    displayMessage(message)
     pygameTextRenderer((displayBoard(missedLetters, correctLetters, secretWord)[0]), 200, -100)
     pygameTextRenderer((displayBoard(missedLetters, correctLetters, secretWord)[1]), 200, 0)
     
@@ -298,7 +302,7 @@ while True:
                     gameIsDone, correctLetters, missedLetters = guessedWord(guess, correctLetters, missedLetters)
                     guessingWord = False
                     
-                    displayMessage("Press any key to Spin Wheel")
+                    message = "Press any key to Spin Wheel"
                 
                     # Ask the player if they want to play again (but only if the game is done).
             
@@ -318,5 +322,5 @@ while True:
                 else:
                     scoreToBeAdded = int(wheelResult)
                 
-                displayMessage(wheelResult)
+                message = "You landed on " + wheelResult
                 guessingWord = True
