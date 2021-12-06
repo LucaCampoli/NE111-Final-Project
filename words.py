@@ -70,6 +70,8 @@ word_list = [
     "carbon nanotube",
     "quantum nanodot",
     "quantum nano center",
+    "pathways",
+    "is that right",
     
     ]
 
