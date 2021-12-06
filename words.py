@@ -54,7 +54,22 @@ word_list = [
     "wet etching",
     "dry etching",
     "eigen values",
-    "eigen spaces"
+    "eigen spaces",
+    "metal deposition",
+    "silicon oxide deposition",
+    "substrate",
+    "nanometer",
+    "nanosecond",
+    "solidworks",
+    "engineering design",
+    "energy band",
+    "micropippeting",
+    "dilution",
+    "soldering",
+    "squeeze theorem",
+    "carbon nanotube",
+    "quantum nanodot",
+    "quantum nano center",
     
     ]
 
