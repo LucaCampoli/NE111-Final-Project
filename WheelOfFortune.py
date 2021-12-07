@@ -81,10 +81,18 @@ def displayBoard(missedLetters, correctLetters, secretWord):
             board += " "
     return (board, missed)
     
-def guessedWord(guess, correctLetters, missedLetters, stage, message):
+def guessedWord(guess, correctLetters, missedLetters, stage, message, scoreToBeAdded, score):
 
     
     if guess in secretWord:
+        
+        for i in secretWord:
+            
+            if i == guess:
+                
+                score += scoreToBeAdded
+                print(scoreToBeAdded)
+        
         correctLetters += guess
         # Check if the player has won.
         foundAllLetters = True
@@ -94,7 +102,7 @@ def guessedWord(guess, correctLetters, missedLetters, stage, message):
                 break
         if foundAllLetters:
             message = 'Yes! The secret word is "' + secretWord + '"! You have won!'
-            return True, correctLetters, missedLetters, stage, message
+            return True, correctLetters, missedLetters, stage, message, score
     else:
         missedLetters += guess
         # Check if player has guessed too many times and lost.
@@ -103,10 +111,10 @@ def guessedWord(guess, correctLetters, missedLetters, stage, message):
             message = 'You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"'
             
             #TODO instance of sleep
-            return True, correctLetters, missedLetters, stage + 1, message
-        return False, correctLetters, missedLetters, stage + 1, message
+            return True, correctLetters, missedLetters, stage + 1, message, score
+        return False, correctLetters, missedLetters, stage + 1, message, score
         
-    return False, correctLetters, missedLetters, stage, message
+    return False, correctLetters, missedLetters, stage, message, score
     """
     (str) -> str
     
@@ -249,8 +257,6 @@ while True:
             sys.exit()
         if event.type == pygame.KEYDOWN:
             
-            print(stage)
-            
             if gameIsDone:
                 if playAgain():
                     windowSurface.fill(WHITE)
@@ -260,7 +266,6 @@ while True:
                     gameIsDone = False
                     secretWord = getRandomWord(wordList)
                     roundNum += 1
-                    score = 0
                     stage = 0
                 else:
                     break
@@ -272,7 +277,7 @@ while True:
                     # TODO print(pygame.key.name(event.key))
                     guess = pygame.key.name(event.key)
                     
-                    gameIsDone, correctLetters, missedLetters, stage, message = guessedWord(guess, correctLetters, missedLetters, stage, message)
+                    gameIsDone, correctLetters, missedLetters, stage, message, score = guessedWord(guess, correctLetters, missedLetters, stage, message, scoreToBeAdded, score)
                     guessingWord = False
 
                     message = "Press any key to Spin Wheel"
@@ -285,6 +290,8 @@ while True:
                 if wheelResult == 'Bankrupt':
                     
                     score = 0
+                    message = "You went Bankrupt"
+                    
                 elif wheelResult == 'Lose a turn':
                     
                     print("Uhhhh")
