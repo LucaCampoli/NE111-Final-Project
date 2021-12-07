@@ -108,7 +108,9 @@ def guessedWord(guess, correctLetters, missedLetters, stage, message, scoreToBeA
         # Check if player has guessed too many times and lost.
         if len(missedLetters) == 6:
             displayBoard(missedLetters, correctLetters, secretWord)
-            message = 'You have run out of guesses!\nAfter ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"'
+            message = 'You have run out of guesses! After ' + str(len(missedLetters)) + ' missed guesses and ' + str(len(correctLetters)) + ' correct guesses, the word was "' + secretWord + '"'
+            
+            print("Ran out of guesses")
             
             #TODO instance of sleep
             return True, correctLetters, missedLetters, stage + 1, message, score
@@ -226,7 +228,7 @@ roundNum = 1
 score = 0
 scoreToBeAdded = 0
 
-message = ""
+message = "Welcome to Wheel of Fortune! Press any key to spin the Wheel"
 
 keys = [pygame.K_a,pygame.K_b,pygame.K_c,pygame.K_d,pygame.K_e,pygame.K_f,pygame.K_g,pygame.K_h,pygame.K_i,pygame.K_j,pygame.K_k,pygame.K_l,pygame.K_m,pygame.K_n,pygame.K_o,pygame.K_p,pygame.K_q,pygame.K_r,pygame.K_a,pygame.K_s,pygame.K_t,pygame.K_u,pygame.K_v,pygame.K_w,pygame.K_x,pygame.K_y,pygame.K_z,pygame.K_QUESTION]
 
@@ -258,7 +260,14 @@ while True:
         if event.type == pygame.KEYDOWN:
             
             if gameIsDone:
-                if playAgain():
+                
+                message = "Press 'Y' to start"
+                
+                if event.key == pygame.K_y:
+                
+                    print("Playing again")
+                    
+                    
                     windowSurface.fill(WHITE)
                     pygame.draw.polygon(windowSurface, GREEN, ((whc-100, wlc+75), (whc-50, wlc+50), (whc-50, wlc+50), (whc-50, wlc-150), (whc+50, wlc-150), (whc+50, wlc-125), (whc+40, wlc-125), (whc+40, wlc-140), (whc-10, wlc-140), (whc-30, wlc-120), (whc-30, wlc+50), (whc+25, wlc+75),))
                     missedLetters = ''
@@ -268,6 +277,9 @@ while True:
                     roundNum += 1
                     stage = 0
                 else:
+                    
+                    print("Break?")
+                    
                     break
             
             if guessingWord:
@@ -280,7 +292,6 @@ while True:
                     gameIsDone, correctLetters, missedLetters, stage, message, score = guessedWord(guess, correctLetters, missedLetters, stage, message, scoreToBeAdded, score)
                     guessingWord = False
 
-                    message = "Press any key to Spin Wheel"
 
                     # Ask the player if they want to play again (but only if the game is done).
 
